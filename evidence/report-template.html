@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>夫婦家計簿アプリ 全工程レポート（ED→UAT/RT）</title>
+<style>
+  :root { --cream:#FFF8EE; --navy:#1E2A4A; --vermillion:#C0392B; --green:#2E7D5B; --amber:#B8860B; --ink:#26221C; --muted:#7A7264; --line:#E5DCC9; --card:#FFFDF8; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",sans-serif; line-height:1.7; }
+  main { max-width:880px; margin:0 auto; padding:0 16px 64px; }
+  section { padding:28px 0 8px; border-bottom:1px solid var(--line); }
+  h1 { font-size:26px; color:var(--navy); margin:0 0 6px; line-height:1.4; }
+  h2 { font-size:19px; color:var(--navy); border-left:6px solid var(--vermillion); padding-left:10px; margin:0 0 14px; }
+  h3 { font-size:15px; color:var(--navy); margin:16px 0 6px; }
+  p { margin:6px 0; font-size:14.5px; }
+  .meta { color:var(--muted); font-size:13px; }
+  .verdict { background:var(--navy); color:#fff; border-radius:12px; padding:16px 18px; margin:14px 0; }
+  .verdict b { color:#FFD9A8; }
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .card h4 { margin:0 0 4px; font-size:14px; color:var(--navy); }
+  .card p { font-size:13.5px; margin:2px 0; }
+  .ok { color:var(--green); font-weight:700; }
+  .warn { color:var(--amber); font-weight:700; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; margin:8px 0 14px; }
+  th, td { border:1px solid var(--line); padding:7px 9px; text-align:left; vertical-align:top; }
+  th { background:#F3EAD6; color:var(--navy); }
+  .shots { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .shots figure { margin:0; }
+  .shots img { width:100%; border:1px solid var(--line); border-radius:10px; display:block; }
+  .shots figcaption { font-size:12.5px; color:var(--muted); margin-top:4px; }
+  .wide img { width:100%; border:1px solid var(--line); border-radius:10px; display:block; }
+  ul { margin:6px 0 6px 18px; padding:0; font-size:14.5px; }
+  li { margin:3px 0; }
+  .small { font-size:12.5px; color:var(--muted); }
+  @media (max-width:760px) {
+    .cards, .shots { grid-template-columns:1fr; }
+    h1 { font-size:22px; }
+    table { font-size:12.5px; }
+    th, td { padding:6px 6px; }
+  }
+</style>
+</head>
+<body>
+<main>
+<section>
+  <p class="meta">夫婦家計簿アプリ 開発ドキュメント一式 ／ 2026-11-15 ／ 仕様書 v1.1 準拠</p>
+  <h1>全工程レポート：設計から受入まで、証跡つきで完了しました</h1>
+  <div class="verdict">
+    <p style="margin:0">結論：<b>ED → ID → 製造 → UT → IT1 → IT2 → ST → UAT/RT の全工程が完了し、リリース可</b>と判定しました。テストは UT 61件・IT1 31件・IT2 13項目（判定21点）・ST 19件・UAT 適合確認すべて合格。画面崩れは全9画面 × 2幅で「なし」を確認しています。</p>
+  </div>
+  <p>前提の確認です。既存の家計簿コードは、このマシンの中にも GitHub（RinkaGit）にも見つかりませんでした。そのため「既存コードの修正」ではなく、<b>仕様書どおりの内容を新規に実装</b>しています。既存の家計簿が PC 側にある場合は、起きてから教えてください。付け合わせて調整します。</p>
+  <p>体制の注記：設計（ED/ID）は Claude Code が担当しましたが、途中でランタイム再起動と Claude Code の5時間上限（復帰 03:10）に当たったため、製造とテストは司令官 Muse が負荷分散ルールに基づいて引き継ぎました。レビュー（RV）は各工程で Codex が独立に実施しています。</p>
+</section>
+
+<section>
+  <h2>工程ごとの結果と証跡</h2>
+  <table>
+    <tr><th style="width:16%">工程</th><th style="width:34%">成果物</th><th style="width:30%">レビュー（RV証跡）</th><th>結果</th></tr>
+    <tr><td>設計書修正</td><td>仕様書 v1.1（U1を決定済みに昇格、未決事項なし）<br><span class="small">docs/spec-v1.1.html</span></td><td>evidence/RV-spec.md（内部reviewer 合格）</td><td class="ok">完了</td></tr>
+    <tr><td>ED（外部設計）</td><td>外部設計書（画面・入力・連携・アラート・非機能）<br><span class="small">docs/ED.md</span></td><td>evidence/RV-ED.md（Codex 合格）</td><td class="ok">完了</td></tr>
+    <tr><td>ID（内部設計）</td><td>内部設計書（モジュール・データ層・計算手順）<br><span class="small">docs/ID.md</span></td><td>evidence/RV-ID.md（Codex 指摘1件=献立の並び順を ED に統一、修正済み）</td><td class="ok">完了</td></tr>
+    <tr><td>製造</td><td>React + Vite アプリ本体（仕様 Phase 1〜5 の全機能）<br><span class="small">src/ 配下、ビルド成功</span></td><td>evidence/RV-M.md（Codex 指摘2件: 高1・中1、対応済み）</td><td class="ok">完了</td></tr>
+    <tr><td>UT</td><td>項目表・運転ログ<br><span class="small">evidence/UT-items.md / test-log.txt、tests/ut/</span></td><td>項目表は工程成果物として自己点検済み</td><td class="ok">61件 全件合格</td></tr>
+    <tr><td>IT1</td><td>項目表（連携①〜③・防災・基本操作）<br><span class="small">evidence/IT1-items.md、tests/it1/</span></td><td>同上</td><td class="ok">31件 全件合格</td></tr>
+    <tr><td>IT2</td><td>項目表（画面遷移・条件表示・設定反映）<br><span class="small">evidence/IT2-items.md、tools/it2-checks.js</span></td><td>実ブラウザ操作で判定21点</td><td class="ok">13項目 全件合格</td></tr>
+    <tr><td>ST</td><td>項目表・全画面スクリーンショット18枚・測定結果<br><span class="small">evidence/ST-items.md / st-shots/ / st-metrics.json</span></td><td>E2Eシナリオ（献立決定の一連）も実施</td><td class="ok">19件 全件合格</td></tr>
+    <tr><td>UAT/RT</td><td>決定 D1〜D6・設計案・運用外項目の適合表、リリース判定<br><span class="small">evidence/UAT-items.md</span></td><td>ソースの機械確認（外部通信・APIキーなし等）を含む</td><td class="ok">全件適合・リリース可</td></tr>
+  </table>
+  <p class="small">テスト実行中に失敗した項目は UT で1件、IT1 で1件ありました。どちらも原因はテスト側の期待値・前提のミスで、実装は設計どおりだったことを確認のうえテストを直し、全件合格まで再実行しています。経緯は各項目表の備考に残してあります。</p>
+</section>
+
+<section>
+  <h2>作ったもの（仕様 Phase 1〜5）</h2>
+  <div class="cards">
+    <div class="card"><h4>家計簿が玄関</h4><p>起動直後は家計簿ホーム。今月の収支、食費の見通し、最近の支出。防災の期限が近いときだけ文脈カードが1枚出ます。</p></div>
+    <div class="card"><h4>支出ハブ＋セグメント</h4><p>［支出一覧｜在庫｜防災備蓄］の切り替え（決定済みの並びと名前）。買い物リストと献立は支出タブ配下のサブ画面です。</p></div>
+    <div class="card"><h4>在庫（期限なし）</h4><p>品目・数量・保管場所だけ。買ってからの日数（◯日目）と「そろそろ使いたい」ピンで管理し、期限は入力しません。</p></div>
+    <div class="card"><h4>防災備蓄（期限あり）</h4><p>水・食料・赤ちゃん用品の充足バー、期限の近い順の一覧、支出タブのバッジとホームのカードは防災の期限だけが対象です。</p></div>
+    <div class="card"><h4>連携5本</h4><p>買い物の消し込み→支出の下書き（金額は本人が確定）、在庫減→買い物リスト、献立決定→不足分と在庫減、優先付け→候補の先頭、購入価格→平均単価と食費の見通し。</p></div>
+    <div class="card"><h4>献立は併用（A＋B）</h4><p>定番レシピ30品から在庫に合わせて候補を出す案Aと、相談文を作って自分のAIアプリに貼る案B。APIキーは使いません。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>画面の証跡（ST撮影から抜粋）</h2>
+  <div class="shots">
+    <figure><img src="__IMG_HOME__" alt="家計簿ホーム（スマホ幅）" /><figcaption>家計簿ホーム（390px）：収支・見通し・防災の期限カード・バッジ1件</figcaption></figure>
+    <figure><img src="__IMG_STOCK__" alt="在庫（スマホ幅）" /><figcaption>在庫（390px）：ピン・経過日数（◯日目）・防災庫の在庫行</figcaption></figure>
+    <figure><img src="__IMG_BOSAI__" alt="防災備蓄（スマホ幅）" /><figcaption>防災備蓄（390px）：充足バーと不足分の追加導線、期限の色分け</figcaption></figure>
+    <figure><img src="__IMG_LIST__" alt="支出一覧（PC幅）" /><figcaption>支出一覧（1280px）：PCでは最大幅560pxで中央寄せ、崩れなし</figcaption></figure>
+  </div>
+  <p class="small">全18枚は evidence/st-shots/ にあります。横はみ出しは機械測定でも全画面「なし」でした（evidence/st-metrics.json）。</p>
+</section>
+
+<section>
+  <h2>既知の制限（リリース判定の前提）</h2>
+  <ul>
+    <li><b>データは端末のブラウザ内保存（localStorage）</b>です。夫婦間での自動同期はされません。ブラウザのデータを消すと消えてしまうため、大切な記録は別途控えが必要です。データ層は分離してあるので、後から Firebase 等の共有保存に差し替えられます。</li>
+    <li><b>初期レシピ30品は一般的な定番での仮置き</b>です。家の定番リストをいただければ差し替えます。</li>
+    <li>実機の iOS Safari では未確認です（検証は Chrome 系。ED の対象ブラウザ範囲内での設計・実装は済み）。</li>
+    <li>認証（ログイン）は持たない作りのため、仕様 D1 の「ログイン直後」は「アプリ起動直後」として実装しています。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>制作体制とトークン</h2>
+  <p class="small">スナップショット: 2026-11-15（納品時点）</p>
+  <table>
+    <tr><th>役割</th><th>担当</th><th>トークン</th></tr>
+    <tr><td>Muse（司令官）</td><td>作業指示、製造の引き継ぎ、テスト実施、最終確認と本レポート</td><td>このセッションの消費量は実行結果から計測不可</td></tr>
+    <tr><td>Claude Code（作業者）</td><td>設計書修正、ED、ID の作成（内部 worker/reviewer 含む）</td><td>設計工程の実行がランタイム再起動で中断され、最終サマリが残らなかったため計測不可</td></tr>
+    <tr><td>Codex（RVer）</td><td>仕様レビュー 28,772 / ED・ID レビュー 48,981 / コードレビュー 53,164</td><td>合計 130,917（実測）</td></tr>
+  </table>
+  <p class="small">推測値は入れていません。計測できないものは「計測不可」と明記しています。</p>
+</section>
+</main>
+</body>
+</html>

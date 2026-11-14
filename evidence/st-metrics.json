@@ -1,0 +1,146 @@
+[
+  {
+    "route": "home",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/home_390.png"
+  },
+  {
+    "route": "expenses-list",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/expenses-list_390.png"
+  },
+  {
+    "route": "expenses-stock",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/expenses-stock_390.png"
+  },
+  {
+    "route": "expenses-bosai",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/expenses-bosai_390.png"
+  },
+  {
+    "route": "shopping",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/shopping_390.png"
+  },
+  {
+    "route": "menu",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/menu_390.png"
+  },
+  {
+    "route": "graph",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/graph_390.png"
+  },
+  {
+    "route": "category-food",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/category-food_390.png"
+  },
+  {
+    "route": "settings",
+    "width": 390,
+    "scrollWidth": 390,
+    "innerWidth": 390,
+    "overflow": false,
+    "file": "evidence/st-shots/settings_390.png"
+  },
+  {
+    "route": "home",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/home_1280.png"
+  },
+  {
+    "route": "expenses-list",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/expenses-list_1280.png"
+  },
+  {
+    "route": "expenses-stock",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/expenses-stock_1280.png"
+  },
+  {
+    "route": "expenses-bosai",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/expenses-bosai_1280.png"
+  },
+  {
+    "route": "shopping",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/shopping_1280.png"
+  },
+  {
+    "route": "menu",
+    "width": 1280,
+    "scrollWidth": 1265,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/menu_1280.png"
+  },
+  {
+    "route": "graph",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/graph_1280.png"
+  },
+  {
+    "route": "category-food",
+    "width": 1280,
+    "scrollWidth": 1280,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/category-food_1280.png"
+  },
+  {
+    "route": "settings",
+    "width": 1280,
+    "scrollWidth": 1265,
+    "innerWidth": 1280,
+    "overflow": false,
+    "file": "evidence/st-shots/settings_1280.png"
+  }
+]

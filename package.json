@@ -1,0 +1,24 @@
+{
+  "name": "kakeibo-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5173 --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --host 127.0.0.1",
+    "test": "vitest run",
+    "test:ut": "vitest run tests/ut",
+    "test:it1": "vitest run tests/it1"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.8",
+    "vitest": "^2.1.2",
+    "jsdom": "^25.0.1"
+  }
+}

@@ -1,0 +1,16 @@
+=== UT実行ログ (vitest run tests/ut) ===
+ ✓ tests/ut/forecast.test.js (8 tests) 8ms
+ ✓ tests/ut/validation.test.js (9 tests) 12ms
+ ✓ tests/ut/menu.test.js (8 tests) 29ms
+ ✓ tests/ut/bosai.test.js (9 tests) 71ms
+ ✓ tests/ut/consult.test.js (6 tests) 103ms
+ ✓ tests/ut/stock.test.js (6 tests) 30ms
+ ✓ tests/ut/dates.test.js (9 tests) 58ms
+ ✓ tests/ut/seed.test.js (6 tests) 69ms
+ Test Files  8 passed (8)
+      Tests  61 passed (61)
+
+=== IT1実行ログ (vitest run tests/it1) ===
+ ✓ tests/it1/linkage.test.js (31 tests) 35ms
+ Test Files  1 passed (1)
+      Tests  31 passed (31)

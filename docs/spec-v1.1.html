@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>夫婦家計簿アプリ 仕様書 v1.1</title>
+<style>
+  :root {
+    --cream: #FFF8EE;
+    --navy: #1E2A4A;
+    --red: #C0392B;
+    --green: #2E7D5B;
+    --amber: #B8860B;
+    --line: #E6DCCB;
+    --card: #FFFFFF;
+    --muted: #5A6278;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--navy);
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", Meiryo, sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 20px 64px; }
+  section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 0 0 24px;
+  }
+  h1 { font-size: 30px; line-height: 1.35; margin: 0 0 8px; }
+  h2 {
+    font-size: 22px; margin: 0 0 16px; padding-bottom: 8px;
+    border-bottom: 3px solid var(--navy);
+  }
+  h2 .no { color: var(--red); margin-right: 8px; }
+  h3 { font-size: 18px; margin: 22px 0 8px; }
+  h4 { font-size: 16px; margin: 14px 0 6px; }
+  p { margin: 0 0 10px; }
+  ul, ol { margin: 0 0 10px; padding-left: 1.4em; }
+  li { margin: 2px 0; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .lead { font-size: 17px; }
+
+  /* 表紙 */
+  .cover { border-top: 8px solid var(--navy); }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 4px 0 18px; color: var(--muted); }
+  .meta b { color: var(--navy); }
+  .purpose { border-left: 4px solid var(--red); padding: 8px 14px; background: var(--cream); margin: 0 0 16px; }
+
+  /* チップ */
+  .chip {
+    display: inline-block; font-size: 12px; font-weight: bold; line-height: 1;
+    padding: 5px 9px; border-radius: 999px; color: #FFFFFF; vertical-align: middle;
+    white-space: nowrap; margin-right: 6px;
+  }
+  .chip.dec { background: var(--navy); }
+  .chip.des { background: var(--green); }
+  .chip.unk { background: var(--amber); }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 10px 14px; background: var(--cream); border-radius: 8px; margin: 0 0 16px; font-size: 14px; }
+
+  /* カード */
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .card {
+    border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; background: var(--card);
+    min-width: 0;
+  }
+  .card.dec { border-left: 6px solid var(--navy); }
+  .card.des { border-left: 6px solid var(--green); }
+  .card.unk { border-left: 6px solid var(--amber); }
+  .card h4 { margin-top: 6px; }
+  .card .id { font-weight: bold; color: var(--red); margin-right: 4px; }
+  .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+  .sub { font-size: 14px; color: var(--muted); margin-top: 18px; margin-bottom: 8px; font-weight: bold; }
+
+  /* 縦ステップ（矢印なし） */
+  ol.steps { list-style: none; padding: 0; margin: 0; counter-reset: st; }
+  ol.steps > li {
+    counter-increment: st; position: relative; padding: 10px 14px 10px 56px; margin: 0 0 10px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--card); min-height: 48px;
+  }
+  ol.steps > li::before {
+    content: counter(st); position: absolute; left: 12px; top: 10px;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: #FFFFFF;
+    font-weight: bold; text-align: center; line-height: 30px; font-size: 15px;
+  }
+  ol.steps > li b { display: block; }
+
+  /* タグ */
+  .tag { display: inline-block; border: 1px solid var(--navy); border-radius: 4px; padding: 0 6px; font-size: 13px; margin: 2px 4px 2px 0; }
+  .tag.stock { border-color: var(--green); color: var(--green); }
+  .tag.bosai { border-color: var(--amber); color: var(--amber); }
+  .bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 14px; }
+  .bar .name { width: 7em; flex: 0 0 auto; }
+  .bar .track { flex: 1 1 auto; height: 12px; border: 1px solid var(--amber); border-radius: 6px; background: var(--cream); position: relative; overflow: hidden; min-width: 0; }
+  .bar .fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--amber); }
+  .note { background: var(--cream); border: 1px dashed var(--line); border-radius: 8px; padding: 10px 14px; font-size: 14px; margin: 12px 0 0; }
+  .diff { border-left: 4px solid var(--red); background: var(--cream); padding: 10px 14px; margin: 12px 0 0; }
+  .diff b { color: var(--red); }
+
+  /* 表 */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; word-break: break-word; overflow-wrap: break-word; }
+  th { background: var(--navy); color: #FFFFFF; font-weight: bold; }
+  td.ent { font-weight: bold; }
+  col.c1 { width: 20%; } col.c2 { width: 56%; } col.c3 { width: 24%; }
+
+  /* 未決 */
+  .bigopen { border: 3px solid var(--amber); border-radius: 10px; padding: 20px; background: var(--cream); }
+  .bigopen .q { font-size: 22px; font-weight: bold; margin: 8px 0; }
+  .seg { display: inline-flex; flex-wrap: wrap; border: 2px solid var(--navy); border-radius: 8px; overflow: hidden; margin: 6px 0 10px; max-width: 100%; }
+  .seg span { padding: 6px 14px; border-right: 1px solid var(--navy); font-size: 15px; }
+  .seg span:last-child { border-right: none; }
+
+  /* 体制 */
+  .role { font-size: 14px; color: var(--muted); }
+  .tok { font-weight: bold; color: var(--navy); margin-top: 6px; }
+
+  .tabs { display: flex; flex-wrap: wrap; border: 2px solid var(--navy); border-radius: 8px; overflow: hidden; margin: 6px 0 14px; }
+  .tabs span { flex: 1 1 0; text-align: center; padding: 8px 4px; border-right: 1px solid var(--navy); font-weight: bold; min-width: 0; }
+  .tabs span:last-child { border-right: none; }
+
+  @media (max-width: 760px) {
+    main { padding: 12px 10px 40px; }
+    section { padding: 18px 14px; }
+    h1 { font-size: 24px; }
+    h2 { font-size: 19px; }
+    .grid, .grid.three { grid-template-columns: minmax(0, 1fr); }
+    /* 表を狭幅でカード化 */
+    table.cardify, table.cardify tbody, table.cardify tr, table.cardify td { display: block; width: 100%; }
+    table.cardify thead, table.cardify colgroup { display: none; }
+    table.cardify tr { border: 1px solid var(--line); border-radius: 8px; margin: 0 0 10px; padding: 6px 0; }
+    table.cardify td { border: none; padding: 4px 12px; }
+    table.cardify td::before { content: attr(data-label); display: block; font-size: 12px; color: var(--muted); font-weight: bold; }
+    .bar .name { width: 6em; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<!-- 1. 表紙 -->
+<section class="cover" id="cover">
+  <h1>夫婦家計簿アプリ 仕様書 v1.1</h1>
+  <div class="meta"><span><b>版</b> v1.1</span><span><b>日付</b> 2026-11-15</span></div>
+  <p class="muted">改訂履歴: v1.1（2026-11-15）U1「セグメントの並びと名前」を決定済みに変更（妻の確認済み）／v1.0（2026-11-15）初版</p>
+  <div class="purpose">
+    <p><b>この仕様書の使い方</b></p>
+    <p>開発時の判断基準として使う。実装中に迷ったら、第2章の決定事項（紺のチップ）に戻って判断する。緑のチップは設計案で、変えてよい。山吹のチップは確認待ちで、確定するまで実装上は仮置きとする。</p>
+  </div>
+  <h3>元になったレポート</h3>
+  <ul>
+    <li>夫婦向けアプリ案の検討レポート（2026-11-14、案12件）</li>
+    <li>家計簿アプリのUI検討レポート（2026-11-14、画面モック5枚）</li>
+    <li>献立候補の2方式と期限方針のレポート（2026-11-14）</li>
+  </ul>
+  <p class="muted">本書と元レポートの記載が異なる場合は、本書を優先する。</p>
+</section>
+
+<!-- 2. 決定事項一覧 -->
+<section id="decisions">
+  <h2><span class="no">2</span>決定事項一覧</h2>
+  <div class="legend">
+    <span><span class="chip dec">決定済み</span>変更しない前提で実装する</span>
+    <span><span class="chip des">設計案</span>決定ではない。実装時に変えてよい</span>
+    <span><span class="chip unk">未確認</span>確認待ち。仮置きで進める</span>
+  </div>
+
+  <div class="sub">決定事項</div>
+  <div class="grid">
+    <div class="card dec"><span class="chip dec">決定済み</span><h4><span class="id">D1</span>起動時の画面</h4><p>ログイン直後は家計簿ホームを表示する。</p></div>
+    <div class="card dec"><span class="chip dec">決定済み</span><h4><span class="id">D2</span>在庫・防災の置き場所</h4><p>在庫・防災は独立した入口にせず「支出の中」に置く。UIは「支出ハブ＋補助導線」とする。主入口は支出画面上部のセグメント［支出一覧｜在庫｜防災備蓄］（セグメントの設置、表示名と並びはいずれも決定済み。表示名と並びは U1 として 2026-11-15 に決定）。補助導線は、ホームの文脈カード、支出登録シート内のトグル、カテゴリ詳細からのリンク。</p></div>
+    <div class="card dec"><span class="chip dec">決定済み</span><h4><span class="id">D3</span>家計簿と在庫（献立）の常時連携</h4><p>連携は5本（第5章）。金額は自動確定せず下書きとし、本人が確認して確定する。</p></div>
+    <div class="card dec"><span class="chip dec">決定済み</span><h4><span class="id">D4</span>AI自動生成はしない</h4><p>APIキーは使わない。アプリ内でAIが自動生成する方式は採用しない。Claude Code 等のサブスクをアプリの実行時に流用することも、Anthropicの利用条件上できないため不採用（公式ルールで確認済み）。</p></div>
+    <div class="card dec"><span class="chip dec">決定済み</span><h4><span class="id">D5</span>期限入力は防災備蓄のみ</h4><p>食品の期限入力は防災備蓄だけで行う。通常の在庫に期限欄はない。在庫の記録項目は品目・数量・保管場所のみ（登録日は自動記録）。</p></div>
+    <div class="card dec"><span class="chip dec">決定済み</span><h4><span class="id">D6</span>献立候補は併用方式</h4><p>案A 定番レシピDB（基本）と、案B AI相談文コピー（補助、相談ボタンを付ける）を併用する。</p></div>
+  </div>
+
+  <div class="sub">設計案</div>
+  <div class="grid three">
+    <div class="card des"><span class="chip des">設計案</span><h4><span class="id">S1</span>通常在庫の優先付け</h4><p>登録日（＝購入日）からの経過日数を自動表示し、経過日数の多い順に並べる。任意の「そろそろ使いたい」ピン（1タップ）で優先を付ける。</p></div>
+    <div class="card des"><span class="chip des">設計案</span><h4><span class="id">S2</span>実装ルート例</h4><p><code>/</code> ＝家計簿、<code>/expenses?tab=list|stock|bosai</code></p></div>
+    <div class="card des"><span class="chip des">設計案</span><h4><span class="id">S3</span>初期レシピ</h4><p>案Aの初期レシピは「よく作る家の定番から30品」で開始する。</p></div>
+  </div>
+
+  <div class="sub">決定済み（v1.1 で昇格）</div>
+  <div class="card dec"><span class="chip dec">決定済み</span><h4><span class="id">U1</span>セグメントの並びと名前</h4><p>［支出一覧｜在庫｜防災備蓄］の並びと名前で確定（2026-11-15、妻の確認済み）。</p></div>
+</section>
+
+<!-- 3. 全体構成と画面 -->
+<section id="structure">
+  <h2><span class="no">3</span>全体構成と画面</h2>
+  <h3>下部タブ</h3>
+  <div class="tabs"><span>家計簿</span><span>支出</span><span>グラフ</span><span>設定</span></div>
+  <p>在庫と防災備蓄は下部タブに出さず、「支出」タブの中のセグメントで切り替える（D2）。</p>
+
+  <h3>画面5点の役割</h3>
+  <div class="grid three">
+    <div class="card"><h4>家計簿ホーム</h4><p>ログイン直後の画面（D1）。今月の収支と、必要なときだけ文脈カードを1枚表示する。</p></div>
+    <div class="card"><h4>支出ハブ（一覧）</h4><p>支出タブの既定表示。上部セグメント［支出一覧｜在庫｜防災備蓄］の起点。</p></div>
+    <div class="card"><h4>在庫</h4><p>セグメント「在庫」。品目・数量・保管場所と経過日数、ピンを表示する。期限は扱わない。</p></div>
+    <div class="card"><h4>防災備蓄</h4><p>セグメント「防災備蓄」。期限と充足バーを表示する。アプリ内で期限を持つ唯一の画面。</p></div>
+    <div class="card"><h4>支出登録シート</h4><p>支出を登録するシート。「在庫に追加」トグルと、条件付きの防災登録チェックを持つ。</p></div>
+  </div>
+
+  <p class="muted"><span class="chip dec">決定済み</span>この章のセグメントの表示名［支出一覧｜在庫｜防災備蓄］と並びは 2026-11-15 に決定（U1）。</p>
+<h3>画面遷移</h3>
+  <p class="muted">UI検討レポートの遷移を基に、バッジとアラートの対象を防災備蓄の期限だけに直したもの。</p>
+  <ol class="steps">
+    <li><b>ログイン後、家計簿ホームを開く</b>今月の収支を表示する。防災備蓄に期限の近い品があるときだけ、文脈カードを1枚出す。</li>
+    <li><b>ホームの文脈カードから防災備蓄へ</b>カードをタップすると、支出タブのセグメント「防災備蓄」が選ばれた状態で開く。</li>
+    <li><b>下部タブ「支出」で支出ハブを開く</b>既定は「支出一覧」。タブのバッジは防災備蓄の期限件数だけを示す。</li>
+    <li><b>セグメントで在庫・防災備蓄を切り替える</b>［支出一覧｜在庫｜防災備蓄］を同じ画面上で切り替える。</li>
+    <li><b>支出登録シートで支出を記録する</b>「在庫に追加」をオンにすると、品目が在庫にも入る。<span class="chip des">設計案</span>「在庫に追加」がオンで保管場所に防災庫を選んだときだけ、防災登録チェックも出る。</li>
+    <li><b>カテゴリ詳細から在庫へ</b>食費などのカテゴリ詳細にあるリンクから、関連する在庫に移る。</li>
+  </ol>
+</section>
+
+<!-- 4. 機能仕様 -->
+<section id="features">
+  <h2><span class="no">4</span>機能仕様</h2>
+
+  <h3>4.1 家計簿</h3>
+  <h4>ホームの表示要素</h4>
+  <ul>
+    <li>今月の支出合計と収支</li>
+    <li>カテゴリ別の内訳（詳細は「グラフ」タブ）</li>
+    <li>文脈カード（最大1枚）: 防災備蓄の期限が近いときだけ出す。アラートの規則は第7章。確認待ちの支出下書きはホームのアラート対象に入れず、支出ハブ側で確認する。</li>
+  </ul>
+  <h4>支出登録の項目</h4>
+  <ul>
+    <li>日付、金額、カテゴリ、品目（品目マスタから選択、または新規）、数量、メモ</li>
+    <li><b>「在庫に追加」トグル</b>: オンにすると、品目と数量を在庫に登録する。保管場所を選ぶ欄が出る。</li>
+    <li><span class="chip des">設計案</span><b>防災登録チェック</b>: 「在庫に追加」がオンで保管場所に防災庫を選んだときだけ表示する。チェックすると防災備蓄品として登録し、期限の入力欄が出る。</li>
+  </ul>
+
+  <h3>4.2 在庫</h3>
+  <ul>
+    <li>項目: 品目、数量、保管場所（登録日は自動記録）。期限欄はない（D5）。</li>
+    <li><span class="chip des">設計案</span>経過日数の自動表示: 登録日からの日数を「◯日目」と表示し、経過日数の多い順に並べる（S1）。</li>
+    <li><span class="chip des">設計案</span>ピン: 「そろそろ使いたい」を1タップで付け外しする。ピン付きの品は一覧の先頭に寄せる（S1）。</li>
+    <li>保管場所チップで絞り込む。<span class="chip des">設計案</span>チップの例: <span class="tag stock">冷蔵</span><span class="tag stock">冷凍</span><span class="tag stock">常温</span><span class="tag bosai">防災庫</span></li>
+    <li>数量を減らすと、しきい値を下回った品は買い物リストに入る（第5章 連携②）。<span class="chip des">設計案</span>しきい値は設定値（品目ごと任意）とし、在庫品目の任意項目「補充の目安数量」で持つ。</li>
+  </ul>
+
+  <h3>4.3 防災備蓄</h3>
+  <ul>
+    <li>項目: 品目、数量、保管場所、<b>期限</b>、区分（水・食料・赤ちゃん用品）。</li>
+    <li>充足バー: 区分ごとに目標量に対する現在量を表示する。目標量は設定で決める。</li>
+  </ul>
+  <div class="card" aria-label="充足バーの表示例">
+    <p class="muted">表示例・値に意味はない（バーの長さはすべて同じにしている）</p>
+    <div class="bar"><span class="name">水</span><span class="track"><span class="fill" style="width:50%"></span></span></div>
+    <div class="bar"><span class="name">食料</span><span class="track"><span class="fill" style="width:50%"></span></span></div>
+    <div class="bar"><span class="name">赤ちゃん用品</span><span class="track"><span class="fill" style="width:50%"></span></span></div>
+  </div>
+  <ul>
+    <li>不足分は「買い物リストに追加」で買い物リストへ入れる（発生源「防災の不足」）。</li>
+  </ul>
+
+  <h3>4.4 献立</h3>
+  <h4>案A 定番レシピDB（基本）</h4>
+  <ul>
+    <li>マッチング規則: レシピの材料タグと在庫を照合し、在庫にある材料が多いレシピを上に出す。同程度なら、<span class="chip des">設計案</span>経過日数の多い材料やピン付きの材料を使うレシピを優先する（S1）。</li>
+    <li>材料タグ: レシピごとに主要材料を品目マスタの品目で付ける。</li>
+    <li><span class="chip des">設計案</span>初期レシピ: よく作る家の定番から30品で開始する（S3）。</li>
+  </ul>
+  <h4>案B AI相談文コピー（補助）</h4>
+  <ul>
+    <li><span class="chip des">設計案</span>相談ボタンの場所: 献立候補の一覧の下に「AIに相談する文をコピー」ボタンを置く。</li>
+    <li><span class="chip des">設計案</span>テンプレートの構成要素（例）:在庫の品目と数量、経過日数の多い品とピン付きの品、人数、避けたい食材、作りたい品数。</li>
+    <li>コピーの流れ: ボタンで相談文をクリップボードにコピーし、利用者が自分の使っているAIサービスに貼り付けて相談する。</li>
+    <li><b>アプリ側はAIを使わない</b>（D4）。アプリは相談文を組み立ててコピーするだけで、AIへの送信や結果の取り込みはしない。</li>
+  </ul>
+  <h4>併用の日常フロー</h4>
+  <ol class="steps">
+    <li><b>献立候補を見る</b>案Aの候補が、在庫・経過日数・ピンの順で並ぶ。</li>
+    <li><b>決まらなければ相談する</b>相談ボタンで相談文をコピーし、外部のAIで相談する。</li>
+    <li><b>献立を決める</b>案Aのレシピを選ぶか、相談で決めた献立を手入力する。</li>
+    <li><b>在庫と買い物リストに反映する</b>不足食材は買い物リストへ入り、使った分は在庫から減る（連携③）。</li>
+  </ol>
+
+  <h3>4.5 買い物リスト</h3>
+  <ul>
+    <li>発生源は3つ: <span class="tag stock">在庫減</span><span class="tag">献立の不足</span><span class="tag bosai">防災の不足</span>。項目ごとに発生源を記録する。</li>
+    <li>消し込み: 買った項目にチェックを付けると、支出の下書きができる。金額は本人が入力・確認して確定する（D3）。</li>
+  </ul>
+  <div class="note"><span class="chip des">設計案</span>実装ルート例（S2）: <code>/</code> ＝家計簿、<code>/expenses?tab=list|stock|bosai</code></div>
+</section>
+
+<!-- 5. 連携ルール -->
+<section id="links">
+  <h2><span class="no">5</span>連携ルール</h2>
+  <p>D3 の5本。どれも金額は自動確定しない。金額が関わるものは下書きにして本人が確定する。</p>
+  <p class="muted"><span class="chip des">設計案</span>各カードの「起きる画面（例）」は実装の目安で、決定事項ではない。</p>
+  <div class="grid">
+    <div class="card dec"><h4><span class="id">①</span>消し込みから支出の下書き</h4><p>買い物リストで項目を消し込むと、支出の下書きを作る。</p><p class="muted">起きる画面（例）:買い物リスト／支出ハブ（一覧）<br>区別: 下書き確認（本人が金額を確認して確定）</p></div>
+    <div class="card dec"><h4><span class="id">②</span>在庫減から買い物リストへ</h4><p>在庫の数量が減ってしきい値を下回ると、買い物リストに入る。<span class="chip des">設計案</span>しきい値は設定値（品目ごと任意）。</p><p class="muted">起きる画面（例）:在庫<br>区別: 自動（金額は関わらない）</p></div>
+    <div class="card dec"><h4><span class="id">③</span>献立決定から不足食材と在庫減</h4><p>献立が決まると、不足食材が買い物リストに入り、使った分が在庫から減る。</p><p class="muted">起きる画面（例）:献立／在庫／買い物リスト<br>区別: 自動（金額は関わらない）</p></div>
+    <div class="card dec"><h4><span class="id">④</span>優先付けで献立候補の先頭へ</h4><p>期限ではなく経過日数とピンで優先を付け、該当の材料を使う献立候補を先頭に出す（D3。経過日数とピンの具体仕様は S1（設計案））。</p><p class="muted">起きる画面（例）:献立<br>区別: 自動（並び順のみ）</p></div>
+    <div class="card dec"><h4><span class="id">⑤</span>購入価格の蓄積と食費の見通し</h4><p>品目ごとの購入価格を家計簿に蓄積し、食費の見通しに使う。</p><p class="muted">起きる画面（例）:家計簿ホーム／グラフ<br>区別: 自動集計（元になる価格は確定済みの支出のみ）</p></div>
+  </div>
+</section>
+
+<!-- 6. データ項目 -->
+<section id="data">
+  <h2><span class="no">6</span>データ項目</h2>
+  <table class="cardify">
+    <colgroup><col class="c1"><col class="c2"><col class="c3"></colgroup>
+    <thead><tr><th>エンティティ</th><th>主な項目</th><th>期限</th></tr></thead>
+    <tbody>
+      <tr><td class="ent" data-label="エンティティ">支出</td><td data-label="主な項目">日付、金額、カテゴリ、品目、数量、メモ、状態（下書き／確定）</td><td data-label="期限">なし</td></tr>
+      <tr><td class="ent" data-label="エンティティ">在庫品目</td><td data-label="主な項目">品目、数量、保管場所、登録日（自動）、ピン、補充の目安数量（任意・<span class="chip des">設計案</span>）</td><td data-label="期限"><b>なし</b>（D5）</td></tr>
+      <tr><td class="ent" data-label="エンティティ">防災備蓄品</td><td data-label="主な項目">品目、数量、保管場所、区分（水・食料・赤ちゃん用品）、期限</td><td data-label="期限"><b>あり</b>（唯一）</td></tr>
+      <tr><td class="ent" data-label="エンティティ">レシピ</td><td data-label="主な項目">名前、材料タグ（品目）、人数</td><td data-label="期限">なし</td></tr>
+      <tr><td class="ent" data-label="エンティティ">買い物リスト項目</td><td data-label="主な項目">品目、数量、発生源（在庫減／献立の不足／防災の不足）、消し込み済み</td><td data-label="期限">なし</td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    <p>品目マスタとカテゴリは家計簿と在庫で共有する。支出・在庫品目・防災備蓄品・レシピ・買い物リスト項目は、同じ品目マスタを参照する。</p>
+    <p><b>保管場所「防災庫」の区別</b>: 保管場所が「防災庫」の在庫品目は、置き場所を示すだけで期限を持たない。期限を持つのは、防災登録チェックを付けて防災備蓄品として登録した品だけとする。両者は別のエンティティとして持ち、防災備蓄品であるかどうかはエンティティの種類で判定する（保管場所の値では判定しない）。</p>
+  </div>
+</section>
+
+<!-- 7. アラートとバッジの規則 -->
+<section id="alerts">
+  <h2><span class="no">7</span>アラートとバッジの規則</h2>
+  <ul>
+    <li><b>対象</b>: 防災備蓄品の期限のみ。</li>
+    <li><b>バッジ数字</b>: 支出タブに、期限が数日以内の防災備蓄品の件数を出す。日数のしきい値は設定値として実装する。</li>
+    <li><b>ホームのカード</b>: 表示するのは優先度が最も高い1枚だけ。</li>
+    <li><b>通常在庫</b>: アラートとバッジの対象外。在庫画面の経過日数表示とピンで確認する。</li>
+  </ul>
+  <div class="diff">
+    <p><b>旧レポートとの差分</b></p>
+    <ul>
+      <li>UI検討レポートにあった「期限が近い在庫」カードは廃止する。</li>
+      <li>家計簿ホームのアラートカードと支出タブのバッジは、防災備蓄の期限だけを対象にする。</li>
+      <li>献立の優先付けは賞味期限ではなく、経過日数とピンで行う（D5・S1）。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 8. 実装フェーズ -->
+<section id="phases">
+  <h2><span class="no">8</span>実装フェーズ</h2>
+  <ol class="steps">
+    <li><b>Phase 1 家計簿の土台</b>家計簿ホーム、支出登録、下部タブ、支出ハブのセグメント、支出登録シートの「在庫に追加」トグル。</li>
+    <li><b>Phase 2 在庫と買い物リスト連携</b>在庫（経過日数・ピン）、買い物リスト、連携①②。</li>
+    <li><b>Phase 3 防災備蓄</b>期限、充足バー、バッジとアラート、防災登録チェック。</li>
+    <li><b>Phase 4 献立A</b>レシピDBとマッチング、連携③④。</li>
+    <li><b>Phase 5 相談ボタンBと連携の仕上げ</b>相談文コピー、連携⑤、全体の調整。</li>
+  </ol>
+</section>
+
+<!-- 9. やらないこと -->
+<section id="notdo">
+  <h2><span class="no">9</span>やらないこと</h2>
+  <ul>
+    <li>APIキーを使うAI自動生成（D4）</li>
+    <li>通常在庫への期限入力（D5）</li>
+    <li>在庫・防災の独立アプリ化（D2）</li>
+    <li>汎用カレンダー、チャット、汎用ToDo（夫婦向けアプリ案の検討レポートの結論）</li>
+  </ul>
+</section>
+
+<!-- 10. 将来候補 -->
+<section id="future">
+  <h2><span class="no">10</span>将来候補（参考）</h2>
+  <p>夫婦向けアプリ案の検討レポートにあった他の案。今回は作らない。</p>
+  <div>
+    <span class="tag">育児交代ログ</span>
+    <span class="tag">家事当番</span>
+    <span class="tag">マイホーム貯金</span>
+    <span class="tag">契約・期限ウォッチ</span>
+    <span class="tag">夫婦健康ログ</span>
+    <span class="tag">予防接種</span>
+    <span class="tag">防災ファイル拡張</span>
+    <span class="tag">夫婦会議メモ</span>
+  </div>
+</section>
+
+<!-- 11. 未決事項 -->
+<section id="open">
+  <h2><span class="no">11</span>未決事項</h2>
+  <p>未決事項なし（U1は2026-11-15に決定）</p>
+</section>
+
+<!-- 12. 制作体制とトークン -->
+<section id="team">
+  <h2><span class="no">12</span>制作体制とトークン</h2>
+  <p class="muted">スナップショット時刻: 2026-11-15 00:01 JST</p>
+  <div class="grid three">
+    <div class="card"><h4>Muse</h4><p class="role">司令官</p><p class="tok">納品メッセージで補足</p></div>
+    <div class="card"><h4>Claude Code</h4><p class="role">作業者（内部で worker が作成、reviewer が確認）</p><p class="tok">納品メッセージで補足</p></div>
+    <div class="card"><h4>Codex</h4><p class="role">RVer</p><p class="tok">納品メッセージで補足</p></div>
+  </div>
+</section>
+
+</main>
+</body>
+</html>
